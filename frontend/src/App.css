@@ -17,17 +17,19 @@
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 52px;
+  height: 64px;
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
 .wordmark {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  display: block;
+  height: 54px;
+  width: 54px;
+  border-radius: 11px;
   margin-right: 2px;
+  object-fit: cover;
 }
 
 .market {
@@ -257,6 +259,7 @@
 .card {
   background: var(--surface);
   border-radius: 18px;
+  border: 0.5px solid var(--sep);
   box-shadow: var(--shadow);
   padding: 22px 24px;
 }

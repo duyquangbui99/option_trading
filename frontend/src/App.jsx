@@ -71,7 +71,7 @@ export default function App() {
       <WordLookup />
       <header className="topbar">
         <div className="topbar-in">
-          <span className="wordmark">Stocks</span>
+          <img src="/stonk.png" alt="Stonk" className="wordmark" />
           <span className="market">
             <span className={`dot${marketOpen ? "" : " closed"}`} />
             {marketOpen ? "Market open" : "Market closed"}
