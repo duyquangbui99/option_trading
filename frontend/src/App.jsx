@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AddStockForm from "./components/AddStockForm";
 import StockList from "./components/StockList";
 import StockDetail from "./components/StockDetail";
+import WordLookup from "./components/WordLookup";
 import { getWatchlist, addToWatchlist, removeFromWatchlist, getHistory } from "./api";
 import { isMarketOpen } from "./marketStatus";
 import "./App.css";
@@ -67,6 +68,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <WordLookup />
       <header className="topbar">
         <div className="topbar-in">
           <span className="wordmark">Stocks</span>

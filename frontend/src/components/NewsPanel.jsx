@@ -29,7 +29,7 @@ export default function NewsPanel({ symbol }) {
 
   return (
     <>
-      <div className="news-head">
+      <div className="section-head">
         <h2>News</h2>
         <button className="ghost" onClick={load} disabled={loading}>
           {loading ? "Refreshing…" : "Refresh"}

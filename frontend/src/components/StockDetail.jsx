@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PriceChart from "./PriceChart";
 import NewsPanel from "./NewsPanel";
+import Overview from "./Overview";
 import { getCandles } from "../api";
 
 const RANGES = ["1D", "1W", "1M", "6M", "1Y"];
@@ -138,6 +139,10 @@ export default function StockDetail({ stock, history }) {
             <dd className="num">{fourthValue}</dd>
           </div>
         </dl>
+      </div>
+
+      <div className="card">
+        <Overview symbol={symbol} />
       </div>
 
       <div className="card">

@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import { getCompanyNews } from "./finnhub.js";
 import { getDailyBars } from "./massive.js";
+import { getOverview } from "./overview.js";
+import { getDefinition, MAX_TEXT_LEN } from "./define.js";
 import {
   initWatchlist,
   listWatchlist,
@@ -73,6 +75,34 @@ app.get("/api/stocks/:symbol/news", async (req, res) => {
         summary,
       }));
     res.json(trimmed);
+  } catch (err) {
+    res.status(502).json({ error: err.message });
+  }
+});
+
+app.get("/api/stocks/:symbol/overview", async (req, res) => {
+  if (!isWatched(req.params.symbol)) {
+    return res.status(404).json({ error: "Symbol is not on the watchlist" });
+  }
+  try {
+    const force = req.query.force === "true";
+    const data = await getOverview(req.params.symbol.toUpperCase(), { force });
+    res.json(data);
+  } catch (err) {
+    res.status(502).json({ error: err.message });
+  }
+});
+
+app.post("/api/define", async (req, res) => {
+  const { text } = req.body ?? {};
+  if (typeof text !== "string" || !text.trim()) {
+    return res.status(400).json({ error: "text is required" });
+  }
+  if (text.trim().length > MAX_TEXT_LEN) {
+    return res.status(400).json({ error: `text must be ${MAX_TEXT_LEN} characters or fewer` });
+  }
+  try {
+    res.json(await getDefinition({ text }));
   } catch (err) {
     res.status(502).json({ error: err.message });
   }

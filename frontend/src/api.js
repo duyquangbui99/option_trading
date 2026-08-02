@@ -22,4 +22,9 @@ export const getHistory = (symbol) => request(`/stocks/${symbol}/history`);
 
 export const getCandles = (symbol, range) => request(`/stocks/${symbol}/candles?range=${range}`);
 
+export const getOverview = (symbol, { force } = {}) =>
+  request(`/stocks/${symbol}/overview${force ? "?force=true" : ""}`);
+
 export const getNews = (symbol) => request(`/stocks/${symbol}/news`);
+
+export const getDefinition = (text) => request("/define", { method: "POST", body: JSON.stringify({ text }) });
