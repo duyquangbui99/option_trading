@@ -285,6 +285,13 @@
   line-height: 1.1;
 }
 
+.ttl p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--label-3);
+  letter-spacing: 0;
+}
+
 .quote {
   text-align: right;
 }

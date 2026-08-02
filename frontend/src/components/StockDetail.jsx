@@ -27,7 +27,7 @@ export default function StockDetail({ stock, history }) {
   const [candles, setCandles] = useState([]);
   const [candlesError, setCandlesError] = useState(null);
   const [scrub, setScrub] = useState(null);
-  const { symbol, price, change, percentChange, open, high, low } = stock;
+  const { symbol, name, price, change, percentChange, open, high, low } = stock;
 
   useEffect(() => {
     setScrub(null);
@@ -95,6 +95,7 @@ export default function StockDetail({ stock, history }) {
         <div className="head">
           <div className="ttl">
             <h1>{symbol}</h1>
+            {name && <p>{name}</p>}
           </div>
           <div className="quote">
             <span className="price num">{displayPrice != null ? `$${money(displayPrice)}` : "—"}</span>

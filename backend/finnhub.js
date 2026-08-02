@@ -28,6 +28,10 @@ export async function symbolExists(symbol) {
   return quote.c !== 0 || quote.pc !== 0;
 }
 
+export function getCompanyProfile(symbol) {
+  return finnhubGet("/stock/profile2", { symbol });
+}
+
 export function getCompanyNews(symbol, { days = 7 } = {}) {
   const to = new Date();
   const from = new Date(to.getTime() - days * 24 * 60 * 60 * 1000);

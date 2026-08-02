@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { getQuote } from "./finnhub.js";
+import { getQuote, getCompanyProfile } from "./finnhub.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "data");
@@ -13,7 +13,18 @@ const MAX_HISTORY_POINTS = 200;
 let entries = []; // [{symbol, addedAt}]
 const history = new Map(); // symbol -> [{time, price}]
 const latestQuote = new Map(); // symbol -> finnhub quote response
+const companyName = new Map(); // symbol -> company name, fetched once (doesn't change)
 let pollTimer = null;
+
+async function fetchCompanyName(symbol) {
+  if (companyName.has(symbol)) return;
+  try {
+    const profile = await getCompanyProfile(symbol);
+    companyName.set(symbol, profile?.name || null);
+  } catch (err) {
+    console.error(`[watchlist] failed to fetch profile for ${symbol}:`, err.message);
+  }
+}
 
 async function persist() {
   await mkdir(DATA_DIR, { recursive: true });
@@ -41,6 +52,7 @@ async function pollSymbol(symbol) {
   try {
     const quote = await getQuote(symbol);
     latestQuote.set(symbol, quote);
+    await fetchCompanyName(symbol);
 
     const series = history.get(symbol) ?? [];
     series.push({ time: Date.now(), price: quote.c });
@@ -71,6 +83,7 @@ export function listWatchlist() {
     const quote = latestQuote.get(e.symbol);
     return {
       symbol: e.symbol,
+      name: companyName.get(e.symbol) ?? null,
       addedAt: e.addedAt,
       price: quote?.c ?? null,
       change: quote?.d ?? null,
@@ -106,6 +119,7 @@ export async function removeSymbol(rawSymbol) {
   entries = entries.filter((e) => e.symbol !== symbol);
   history.delete(symbol);
   latestQuote.delete(symbol);
+  companyName.delete(symbol);
   await persist();
   return listWatchlist();
 }
