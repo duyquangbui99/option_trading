@@ -3,13 +3,15 @@ import AddStockForm from "./components/AddStockForm";
 import StockList from "./components/StockList";
 import StockDetail from "./components/StockDetail";
 import WordLookup from "./components/WordLookup";
-import { getWatchlist, addToWatchlist, removeFromWatchlist, getHistory } from "./api";
+import Login from "./components/Login";
+import { getWatchlist, addToWatchlist, removeFromWatchlist, getHistory, getToken, clearToken } from "./api";
 import { isMarketOpen } from "./marketStatus";
 import "./App.css";
 
 const POLL_MS = 15_000;
 
 export default function App() {
+  const [authed, setAuthed] = useState(() => Boolean(getToken()));
   const [watchlist, setWatchlist] = useState([]);
   const [histories, setHistories] = useState({});
   const [selectedSymbol, setSelectedSymbol] = useState(null);
@@ -18,6 +20,7 @@ export default function App() {
   const [marketOpen, setMarketOpen] = useState(() => isMarketOpen());
 
   useEffect(() => {
+    if (!authed) return;
     let cancelled = false;
 
     async function load() {
@@ -40,7 +43,12 @@ export default function App() {
         );
         if (!cancelled) setHistories(Object.fromEntries(entries));
       } catch (err) {
-        if (!cancelled) setLoadError(err.message);
+        if (cancelled) return;
+        if (!getToken()) {
+          setAuthed(false);
+        } else {
+          setLoadError(err.message);
+        }
       }
     }
 
@@ -50,7 +58,11 @@ export default function App() {
       cancelled = true;
       clearInterval(id);
     };
-  }, []);
+  }, [authed]);
+
+  if (!authed) {
+    return <Login onSuccess={() => setAuthed(true)} />;
+  }
 
   async function handleAdd(symbol) {
     const updated = await addToWatchlist(symbol);
@@ -81,6 +93,16 @@ export default function App() {
               ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
               : ""}
           </span>
+          <button
+            type="button"
+            className="logout-btn"
+            onClick={() => {
+              clearToken();
+              setAuthed(false);
+            }}
+          >
+            Sign out
+          </button>
         </div>
       </header>
 

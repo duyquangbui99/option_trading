@@ -1,4 +1,5 @@
 import "dotenv/config";
+import crypto from "crypto";
 import express from "express";
 import cors from "cors";
 import { getCompanyNews } from "./finnhub.js";
@@ -15,10 +16,32 @@ import {
 } from "./watchlist.js";
 
 const CANDLE_RANGES = new Set(["1W", "1M", "6M", "1Y"]);
+const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
+const sessions = new Map();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.post("/api/login", (req, res) => {
+  const { password } = req.body ?? {};
+  if (typeof password !== "string" || password !== process.env.password) {
+    return res.status(401).json({ error: "Incorrect password" });
+  }
+  const token = crypto.randomBytes(24).toString("hex");
+  sessions.set(token, Date.now() + SESSION_MS);
+  res.json({ token });
+});
+
+app.use("/api", (req, res, next) => {
+  const token = req.headers.authorization?.replace(/^Bearer\s+/i, "");
+  const expiry = token && sessions.get(token);
+  if (!expiry || expiry < Date.now()) {
+    sessions.delete(token);
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+  next();
+});
 
 app.get("/api/watchlist", (req, res) => {
   res.json(listWatchlist());
