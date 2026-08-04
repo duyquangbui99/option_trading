@@ -52,5 +52,3 @@ export const getOverview = (symbol, { force } = {}) =>
   request(`/stocks/${symbol}/overview${force ? "?force=true" : ""}`);
 
 export const getNews = (symbol) => request(`/stocks/${symbol}/news`);
-
-export const getDefinition = (text) => request("/define", { method: "POST", body: JSON.stringify({ text }) });
